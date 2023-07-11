@@ -9,4 +9,5 @@ export interface VideoInfo {
   poster: string
   duration: string
   current: number
+  subtitle: string
 }

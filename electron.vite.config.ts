@@ -1,10 +1,14 @@
-import { resolve } from 'path'
 import {
+  bytecodePlugin,
   defineConfig,
   externalizeDepsPlugin,
-  bytecodePlugin,
   splitVendorChunkPlugin
 } from 'electron-vite'
+
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import { resolve } from 'path'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
@@ -20,6 +24,23 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [vue(), splitVendorChunkPlugin()]
+    plugins: [vue(), splitVendorChunkPlugin(),
+      AutoImport({
+        imports: [
+          'vue',
+          {
+            'naive-ui': [
+              'useDialog',
+              'useMessage',
+              'useNotification',
+              'useLoadingBar'
+            ]
+          }
+        ]
+      }),
+      Components({
+        resolvers: [NaiveUiResolver()]
+      })
+    ]
   }
 })

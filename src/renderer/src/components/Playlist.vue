@@ -43,7 +43,9 @@ defineExpose({
 </script>
 
 <template>
-  <div v-if="expand" class="playlist">
+  <n-drawer v-model:show="expand" :width="300" placement="right">
+    <n-drawer-content title="历史记录" closable>
+  <div  class="playlist">
     <overlay-scrollbars
       class="playlist-container"
       :options="{
@@ -61,6 +63,8 @@ defineExpose({
       </ul>
     </overlay-scrollbars>
   </div>
+</n-drawer-content>
+</n-drawer>
 </template>
 
 <style lang="less">

@@ -1,7 +1,8 @@
-import { app, JumpListCategory, JumpListItem } from 'electron'
+import { JumpListCategory, JumpListItem, app } from 'electron'
+
+import { VideoInfo } from '../common/types'
 import { platform } from '@electron-toolkit/utils'
 import { store } from './store'
-import { VideoInfo } from '../common/types'
 
 export const clearWindowJumpList = (): void => {
   if (!platform.isWindows) {
@@ -11,6 +12,7 @@ export const clearWindowJumpList = (): void => {
 }
 
 export const setWindowJumpList = (videoList?: VideoInfo[]): void => {
+  clearWindowJumpList()
   if (!platform.isWindows) {
     return
   }
