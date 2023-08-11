@@ -1,17 +1,25 @@
 <template>
-  <div class="word">
-    <h1>{{ word }}</h1>
-    <div v-for="(phonetic, index) in wordData.phonetics" :key="index">
-      <template v-if="phonetic.audio">
-        <h2>{{ phonetic.text }}</h2>
-        <n-button @click="playAudio(phonetic.audio)">Play</n-button>
-      </template>
+  <div>
+    <div class="translation__basic">
+      <ul class="translation__list">
+        <li v-for="item in basic.explains" :key="item" class="translation__item">{{ item }}</li>
+      </ul>
+      <button
+        v-if="basic.phonetic"
+        class="translation__audio-button"
+        @click="playAudio(basic['uk-speech'])"
+      >
+        {{ basic.phonetic }}
+      </button>
     </div>
-    <div v-for="(meaning, index) in meanings" :key="index">
-      <h2>{{ meaning.partOfSpeech }}</h2>
-      <ul>
-        <li v-for="(definition, i) in meaning.definitions" :key="i">
-          {{ definition.definition }}
+    <div v-if="web" class="translation__web">
+      <h3 class="translation__subtitle">网络释义</h3>
+      <ul class="translation__list">
+        <li v-for="item in web" :key="item.key" class="translation__item">
+          <h4 class="translation__subsubtitle">{{ item.key }}</h4>
+          <ul class="translation__list">
+            <li v-for="value in item.value" :key="value" class="translation__item">{{ value }}</li>
+          </ul>
         </li>
       </ul>
     </div>
@@ -19,58 +27,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-
-interface Definition {
-  definition: string
-  audioUrl: string
-}
-
-interface Meaning {
-  partOfSpeech: string
-  definitions: Definition[]
-}
-
-interface WordData {
-  word: string
-  meanings: Meaning[]
-}
-
+// defineProps
 const props = defineProps<{
-  wordData: WordData
+  basic: {
+    phonetic: string
+    explains: string[]
+  }
+  web: {
+    key: string
+    value: string[]
+  }[]
 }>()
 
-const word = computed(() => props.wordData.word)
-const meanings = computed(() => props.wordData.meanings)
-
-function playAudio(audioUrl: string) {
-  console.log(audioUrl)
-  const audio = new Audio(audioUrl)
+const playAudio = (phonetic): void => {
+  const audio = new Audio(phonetic)
   audio.play()
 }
 </script>
 
-<style>
-.word {
-  margin: 20px;
+<style scoped>
+.translation__audio-button {
+  font-size: 20px;
+
+  width: 200px;
+  height: 30px;
 }
-h1 {
-  font-size: 36px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.translation__basic {
+  font-size: 18px;
 }
-h2 {
+.translation {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: white;
+}
+
+.translation__title {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 16px;
 }
-ul {
-  margin-left: 20px;
+
+.translation__subtitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
-li {
-  margin-bottom: 5px;
+
+.translation__subsubtitle {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
-button {
-  margin-left: 10px;
+
+.translation__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.translation__item {
+  margin-bottom: 8px;
 }
 </style>

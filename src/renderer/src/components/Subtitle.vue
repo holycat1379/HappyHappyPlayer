@@ -14,7 +14,7 @@
                 <span :class="{ highlight: highlightedWordIndex === index }"> {{ word }} </span>
               </template>
               <div>
-                <Word v-for="(item, index) in wordDictionary" :key="index" :word-data="item"></Word>
+                <Word v-bind="translation"></Word>
               </div>
             </n-popover>
           </span>
@@ -40,6 +40,7 @@ import Player from './components/Player.vue'
 import { watchEffect, ref, watch, onMounted, computed } from 'vue'
 import { throttle } from 'lodash'
 import Word from './Word.vue'
+import useYoudaoTranslation from '@renderer/hook/useTranslation'
 const chShow = ref<boolean>(false)
 const enShow = ref<boolean>(false)
 const isShowDict = ref(false)
@@ -103,7 +104,10 @@ const subtitle = ref<Line>({
 const words = computed(() => {
   return subtitle.value.text.split(' ')
 })
-
+const { translate, translation } = useYoudaoTranslation(
+  '362903ece35a84a7',
+  'kF00zRyW52TdegYX77Wkx95B6JgAJnbY'
+)
 const highlightedWordIndex = ref()
 const wordDictionary = ref()
 const highlightWord = (index: number | null) => {
@@ -111,14 +115,17 @@ const highlightWord = (index: number | null) => {
   highlightedWordIndex.value = index
   getWord(words.value[index], wordDictionary)
 }
-const getWord = throttle((word, wordDictionary) => {
+const getWord = throttle(async (word, wordDictionary) => {
   console.log(word)
   if (word) {
     // 去除word中的符号
     word = word.replace(/[.,#!$%^&*;:{}=\-_`~()]/g, '')
-    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`).then(async (response) => {
-      wordDictionary.value = await response.json()
-    })
+    console.log(word)
+    await translate(word)
+    console.log(translation.value)
+    // fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`).then(async (response) => {
+    //   wordDictionary.value = await response.json()
+    // })
   }
 }, 1000)
 
@@ -140,32 +147,6 @@ watch(
     }
   }
 )
-
-// Get current subtitle item by current time
-// watch(
-//   () => props.player?.currentStartSeconds,
-//   () => {
-//     currentItemArray.length = 0
-//     props.srtList.forEach((item, index) => {
-//       // 如果是最后一个 则下一个开始时间为0 也就是视频结束时间
-//       let nextStartSeconds = props.srtList[index + 1] ? props.srtList[index + 1].startSeconds : 0
-//
-//       // 如果两者相等说明存在同样两个的时间 就需要判断下一个的下一个时间
-//       if (nextStartSeconds === item.startSeconds && props.srtList[index + 2]) {
-//         nextStartSeconds = props.srtList[index + 2].startSeconds
-//       }
-//
-//       // 如果当前时间大于等于当前字幕开始时间 并且小于下一个字幕开始时间 则说明当前字幕正在播放
-//       if (
-//         props.player?.currentStartSeconds >= item.startSeconds &&
-//         props.player?.currentStartSeconds < nextStartSeconds
-//       ) {
-//         item.text = item.text.replace(/\n/g, '<br/>')
-//         currentItemArray.push(item)
-//       }
-//     })
-//   }
-// )
 </script>
 
 <style scoped>
